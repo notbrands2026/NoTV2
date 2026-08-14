@@ -1,0 +1,9 @@
+{
+  "name":"not-v2",
+  "private":true,
+  "scripts":{
+    "dev":"next dev",
+    "build":"next build",
+    "start":"next start"
+  }
+}
