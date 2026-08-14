@@ -1,11 +1,24 @@
-# NoT v2.0
+# NoT v2.0 — Vercel-ready
 
-Starter scaffold for a Vercel-native Next.js ecommerce project.
+A minimal Next.js ecommerce storefront scaffold configured for Vercel.
 
-## Stack
-- Next.js
-- React
-- TypeScript
-- Tailwind CSS
+## Run locally
+```bash
+npm install
+npm run dev
+```
 
-This is the Stage 1 scaffold. Continue by adding Firebase, Razorpay, Cloudinary, and admin features.
+## Production build
+```bash
+npm run build
+npm start
+```
+
+## Deploy to Vercel
+Import this repository into Vercel, or run:
+```bash
+npx vercel
+npx vercel --prod
+```
+
+No secrets are required for this Stage 1 scaffold.
