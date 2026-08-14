@@ -1,8 +1,28 @@
-export default function Home() {
-  return (
-    <main style={{ padding: 40, fontFamily: "system-ui, sans-serif" }}>
-      <h1>NoT — Need of Time</h1>
-      <p>Vercel-ready ecommerce storefront scaffold.</p>
-    </main>
-  );
+"use client";
+import { useEffect, useMemo, useState } from "react";
+import { products, type Product } from "./products";
+import "./store.css";
+type CartItem = Product & { size: string; quantity: number };
+const money = (n:number)=>new Intl.NumberFormat("en-IN",{style:"currency",currency:"INR",maximumFractionDigits:0}).format(n);
+export default function Home(){
+ const [category,setCategory]=useState("All"),[query,setQuery]=useState(""),[cart,setCart]=useState<CartItem[]>([]),[cartOpen,setCartOpen]=useState(false),[menuOpen,setMenuOpen]=useState(false),[ready,setReady]=useState(false);
+ useEffect(()=>{const saved=localStorage.getItem("not-cart");if(saved)setCart(JSON.parse(saved));setReady(true)},[]);
+ useEffect(()=>{if(ready)localStorage.setItem("not-cart",JSON.stringify(cart))},[cart,ready]);
+ const shown=useMemo(()=>products.filter(p=>(category==="All"||p.category===category)&&p.name.toLowerCase().includes(query.toLowerCase())),[category,query]);
+ const count=cart.reduce((s,i)=>s+i.quantity,0),subtotal=cart.reduce((s,i)=>s+i.price*i.quantity,0);
+ function add(product:Product,size:string){setCart(c=>{const found=c.find(i=>i.id===product.id&&i.size===size);return found?c.map(i=>i===found?{...i,quantity:i.quantity+1}:i):[...c,{...product,size,quantity:1}]});setCartOpen(true)}
+ function changeQuantity(id:number,size:string,delta:number){setCart(c=>c.map(i=>i.id===id&&i.size===size?{...i,quantity:i.quantity+delta}:i).filter(i=>i.quantity>0))}
+ function checkout(){const lines=cart.map(i=>`• ${i.name} (${i.size}) × ${i.quantity} — ${money(i.price*i.quantity)}`);const msg=encodeURIComponent(`Hello NoT! I would like to place an order:\n\n${lines.join("\n")}\n\nTotal: ${money(subtotal)}\n\nPlease confirm availability and delivery details.`);window.open(`https://wa.me/919840079736?text=${msg}`,"_blank","noopener,noreferrer")}
+ return <>
+  <div className="announcement">Free shipping across India on orders above ₹1,499</div>
+  <header className="header"><button className="icon mobile-only" aria-label="Open menu" onClick={()=>setMenuOpen(!menuOpen)}>☰</button><a className="logo" href="#top">NoT<span>Need of Time</span></a><nav className={menuOpen?"nav open":"nav"}>{[["New arrivals","new"],["Shop","shop"],["Our story","story"],["Contact","contact"]].map(([n,id])=><a key={id} href={`#${id}`} onClick={()=>setMenuOpen(false)}>{n}</a>)}</nav><button className="cart-button" onClick={()=>setCartOpen(true)}>Bag <b>{count}</b></button></header>
+  <main id="top"><section className="hero" id="new"><div className="hero-copy"><p className="eyebrow">THE EVERYDAY EDIT · 2026</p><h1>Ease, made<br/>beautiful.</h1><p>Thoughtful silhouettes in breathable fabrics—made for real days, slow mornings and everywhere in between.</p><a className="primary" href="#shop">Shop the collection →</a></div><div className="hero-photo" role="img" aria-label="NoT everyday clothing collection"><span>New<br/>season</span></div></section>
+  <section className="benefits"><div><b>Easy exchanges</b><span>7-day size exchange</span></div><div><b>Made in India</b><span>Designed with care</span></div><div><b>Secure checkout</b><span>Order directly with us</span></div></section>
+  <section className="section" id="shop"><div className="section-heading"><div><p className="eyebrow">CURATED FOR YOU</p><h2>Shop everyday essentials</h2></div><label className="search"><span>⌕</span><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search styles" aria-label="Search products"/></label></div><div className="filters">{["All","Dresses","Tops","Bottoms","Sets"].map(x=><button className={category===x?"active":""} onClick={()=>setCategory(x)} key={x}>{x}</button>)}</div><div className="product-grid">{shown.map(p=><ProductCard product={p} add={add} key={p.id}/>)}</div>{!shown.length&&<p className="empty-search">No styles match your search.</p>}</section>
+  <section className="story" id="story"><div className="story-image" role="img" aria-label="Natural fabric detail"/><div><p className="eyebrow">WHY NoT</p><h2>Clothes that keep up with life.</h2><p>We started Need of Time with one idea: everyday clothing should feel as good as it looks. Our pieces pair relaxed fits with considered details, so getting dressed feels effortless.</p><a href="#shop">Discover our essentials →</a></div></section>
+  <section className="newsletter" id="contact"><p className="eyebrow">JOIN THE NoT COMMUNITY</p><h2>A little style in your inbox.</h2><p>New drops, styling notes and first access—never too much.</p><form onSubmit={e=>{e.preventDefault();alert("Thank you for joining NoT!")}}><input required type="email" placeholder="Your email address"/><button>Join us</button></form></section></main>
+  <footer><a className="logo light" href="#top">NoT<span>Need of Time</span></a><p>Comfort. Simplicity. You.</p><p>© 2026 NoT — Need of Time</p></footer>
+  {cartOpen&&<div className="overlay" onClick={()=>setCartOpen(false)}/>}<aside className={cartOpen?"cart open":"cart"}><div className="cart-head"><div><p className="eyebrow">YOUR SELECTION</p><h2>Shopping bag ({count})</h2></div><button onClick={()=>setCartOpen(false)}>×</button></div><div className="cart-items">{!cart.length?<div className="empty"><span>○</span><h3>Your bag is empty</h3><p>Find something made for your everyday.</p><button className="primary" onClick={()=>setCartOpen(false)}>Start shopping</button></div>:cart.map(i=><article className="cart-item" key={`${i.id}-${i.size}`}><img src={i.image} alt=""/><div><h3>{i.name}</h3><p>Size {i.size}</p><div className="quantity"><button onClick={()=>changeQuantity(i.id,i.size,-1)}>−</button><span>{i.quantity}</span><button onClick={()=>changeQuantity(i.id,i.size,1)}>+</button></div></div><b>{money(i.price*i.quantity)}</b></article>)}</div>{!!cart.length&&<div className="cart-total"><div><span>Subtotal</span><b>{money(subtotal)}</b></div><p>Shipping calculated after address confirmation.</p><button className="checkout" onClick={checkout}>Checkout on WhatsApp →</button></div>}</aside>
+ </>
 }
+function ProductCard({product,add}:{product:Product;add:(p:Product,s:string)=>void}){const[size,setSize]=useState(product.sizes[0]);return <article className="product-card"><div className="product-image"><img src={product.image} alt={product.name} loading="lazy"/>{product.badge&&<span>{product.badge}</span>}</div><div className="product-info"><p>{product.category}</p><h3>{product.name}</h3><div className="price"><b>{money(product.price)}</b>{product.oldPrice&&<s>{money(product.oldPrice)}</s>}</div><div className="buy-row"><select value={size} onChange={e=>setSize(e.target.value)}>{product.sizes.map(s=><option key={s}>{s}</option>)}</select><button onClick={()=>add(product,size)}>Add to bag</button></div></div></article>}
