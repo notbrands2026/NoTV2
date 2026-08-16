@@ -1,0 +1,3 @@
+"use client";
+import { useState } from "react";
+export default function Account(){const [email,setEmail]=useState("");return <main className="checkoutPage"><header className="simpleHeader"><a className="brand" href="/"><img src="/not-logo.png" alt="NoT"/></a><a href="/">← Store</a></header><div className="checkoutWrap"><div><p className="eyebrow">NO T · ACCOUNT</p><h1>Your NoT account.</h1><p className="lead">Customer accounts are ready for database-backed order history. Enter your email to continue.</p><input type="email" value={email} onChange={e=>setEmail(e.target.value)} placeholder="you@example.com"/><button className="primary" onClick={()=>alert("Account authentication is ready to connect to your chosen auth provider.")}>Continue</button></div></div></main>}

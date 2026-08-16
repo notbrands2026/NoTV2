@@ -1,24 +1,21 @@
-# NoT — Need of Time · Stage 3
+# NoT — Need of Time · Stage 4
 
-Stage 3 ecommerce foundation for Vercel/Next.js.
+Stage 4 adds a production ecommerce foundation: PostgreSQL order storage with Prisma, Razorpay and Stripe payment checkout, signed-provider webhooks, an admin order view, and an account foundation.
 
-## Included
-- NoT logo and branded storefront
-- Product search and category filtering
-- Persistent cart using browser storage
-- Checkout page with delivery details
-- Order confirmation page with order number
-- Responsive mobile layout
-- Payment-provider integration points (Stripe/Razorpay) via environment variables
+## Deploy to Vercel
 
-## Run locally
-```bash
-npm install
-npm run dev
-```
+1. Push this project to GitHub.
+2. In Vercel, connect the repository and use `main` as production.
+3. Add the variables from `.env.example` in **Settings → Environment Variables**.
+4. Create a PostgreSQL database (Supabase, Neon, or Vercel Postgres) and set `DATABASE_URL`.
+5. Run `npx prisma db push` locally against that database, or run the equivalent SQL/schema migration from `prisma/schema.prisma`.
+6. Configure Razorpay or Stripe webhooks:
+   - Razorpay: `https://notbrands2026.vercel.app/api/webhooks/razorpay`
+   - Stripe: `https://notbrands2026.vercel.app/api/webhooks/stripe`
+7. Redeploy after environment variables are added.
 
-## Production payments
-The checkout flow intentionally does **not** collect card details. To accept live payments, connect Stripe or Razorpay and add the provider credentials from `.env.example` to Vercel Project Settings → Environment Variables, then implement the provider's server-side checkout/session endpoint.
+## Admin
+Open `/admin` and enter the `ADMIN_TOKEN` value. The dashboard reads orders from PostgreSQL.
 
-## Deploy
-Import the repository into Vercel or connect it through GitHub. Vercel detects Next.js automatically.
+## Notes
+Live payments require merchant accounts and credentials. Never commit `.env` files or secret keys to GitHub.
