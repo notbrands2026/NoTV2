@@ -1,6 +1,5 @@
  "use client";
 
-import "./globals.css";
 import Link from "next/link";
 import { useEffect } from "react";
 
@@ -37,7 +36,7 @@ export default function Home() {
       const text = `${p.name} ${p.description} ${p.category}`.toLowerCase();
       return matchesCategory && text.includes(query.toLowerCase());
     });
-  }, [category, query]);
+  }, [products, category, query]);
 
   const cartProducts = cart.map((id) => products.find((p) => p.id === id)!).filter(Boolean);
   const total = cartProducts.reduce((sum, p) => sum + p.price, 0);
