@@ -1,6 +1,6 @@
 # NoT — Need of Time · Stage 4
 
-Stage 4 adds a production ecommerce foundation: PostgreSQL order storage with Prisma, Razorpay and Stripe payment checkout, signed-provider webhooks, an admin order view, and an account foundation.
+Stage 4 Admin adds a PostgreSQL-backed product catalogue, secure product and inventory management, order management, Razorpay and Stripe checkout, and signed-provider webhooks.
 
 ## Deploy to Vercel
 
@@ -15,7 +15,9 @@ Stage 4 adds a production ecommerce foundation: PostgreSQL order storage with Pr
 7. Redeploy after environment variables are added.
 
 ## Admin
-Open `/admin` and enter the `ADMIN_TOKEN` value. The dashboard reads orders from PostgreSQL.
+Open `/admin` and enter the same `ADMIN_TOKEN` value configured in Vercel. You can add, edit, hide and delete products, set prices and stock, attach an image URL, and review orders. Product changes are stored in PostgreSQL and appear automatically on the storefront and checkout.
+
+For product images, upload the image to a public image host such as Cloudinary, then paste its secure HTTPS URL into **Product image URL**.
 
 ## Notes
 Live payments require merchant accounts and credentials. Never commit `.env` files or secret keys to GitHub.
