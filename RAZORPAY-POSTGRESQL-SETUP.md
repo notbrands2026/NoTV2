@@ -13,8 +13,10 @@ Required Vercel environment variables:
 - RAZORPAY_WEBHOOK_SECRET
 - ADMIN_TOKEN
 
-Vercel build command:
+Database setup is automatic on deployment through the included initial migration.
 
-prisma generate && prisma migrate deploy && next build
+Vercel build command (already configured in `package.json`):
+
+npm run build
 
 Never commit Razorpay secrets or DATABASE_URL to GitHub.
