@@ -1,6 +1,6 @@
-# NoT v2.1 — E-commerce Storefront
+# NoT v2.0 — Vercel-ready
 
-A responsive Next.js storefront with product search and filters, size selection, a persistent cart, responsive navigation, and WhatsApp checkout.
+A minimal Next.js ecommerce storefront scaffold configured for Vercel.
 
 ## Run locally
 ```bash
@@ -21,4 +21,4 @@ npx vercel
 npx vercel --prod
 ```
 
-No secrets are required. Edit products in `app/products.ts` and the checkout number in `app/page.tsx`.
+No secrets are required for this Stage 1 scaffold.

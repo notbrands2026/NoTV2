@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "NoT — Need of Time | Everyday Womenswear",
-  description: "Comfortable, minimal womenswear designed for every day.",
+  title: "NoT — Need of Time",
+  description: "NoT ecommerce storefront",
 };
 
 export default function RootLayout({
