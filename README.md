@@ -1,6 +1,15 @@
-# NoT v2.0 — Vercel-ready
+# NoT — Need of Time · Stage 3
 
-A minimal Next.js ecommerce storefront scaffold configured for Vercel.
+Stage 3 ecommerce foundation for Vercel/Next.js.
+
+## Included
+- NoT logo and branded storefront
+- Product search and category filtering
+- Persistent cart using browser storage
+- Checkout page with delivery details
+- Order confirmation page with order number
+- Responsive mobile layout
+- Payment-provider integration points (Stripe/Razorpay) via environment variables
 
 ## Run locally
 ```bash
@@ -8,17 +17,8 @@ npm install
 npm run dev
 ```
 
-## Production build
-```bash
-npm run build
-npm start
-```
+## Production payments
+The checkout flow intentionally does **not** collect card details. To accept live payments, connect Stripe or Razorpay and add the provider credentials from `.env.example` to Vercel Project Settings → Environment Variables, then implement the provider's server-side checkout/session endpoint.
 
-## Deploy to Vercel
-Import this repository into Vercel, or run:
-```bash
-npx vercel
-npx vercel --prod
-```
-
-No secrets are required for this Stage 1 scaffold.
+## Deploy
+Import the repository into Vercel or connect it through GitHub. Vercel detects Next.js automatically.
