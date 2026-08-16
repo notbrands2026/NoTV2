@@ -1,165 +1,26 @@
- "use client";
-
+"use client";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
+type Product={id:number;name:string;category:string;price:number;description:string;tag?:string;imageUrl?:string|null;stock:number};
 
-import { useMemo, useState } from "react";
-
-type Product = {
-  id: number;
-  name: string;
-  category: string;
-  price: number;
-  description: string;
-  tag?: string;
-  imageUrl?: string | null;
-  stock: number;
-};
-
-export default function Home() {
-  const [category, setCategory] = useState("All");
-  const [query, setQuery] = useState("");
-  const [cart, setCart] = useState<number[]>([]);
-  const [cartOpen, setCartOpen] = useState(false);
-  const [products, setProducts] = useState<Product[]>([]);
-
-  useEffect(() => {
-    try { setCart(JSON.parse(localStorage.getItem("not-cart") || "[]")); } catch {}
-    fetch("/api/products", { cache: "no-store" }).then(r=>r.json()).then(d=>setProducts(d.products||[])).catch(()=>setProducts([]));
-  }, []);
-
-  useEffect(() => { localStorage.setItem("not-cart", JSON.stringify(cart)); }, [cart]);
-
-  const visibleProducts = useMemo(() => {
-    return products.filter((p) => {
-      const matchesCategory = category === "All" || p.category === category;
-      const text = `${p.name} ${p.description} ${p.category}`.toLowerCase();
-      return matchesCategory && text.includes(query.toLowerCase());
-    });
-  }, [products, category, query]);
-
-  const cartProducts = cart.map((id) => products.find((p) => p.id === id)!).filter(Boolean);
-  const total = cartProducts.reduce((sum, p) => sum + p.price, 0);
-  const categories = useMemo(() => ["All", ...Array.from(new Set(products.map(p=>p.category)))], [products]);
-
-  function addToCart(id: number) {
-    setCart((current) => [...current, id]);
-  }
-
-  function removeFromCart(index: number) {
-    setCart((current) => current.filter((_, i) => i !== index));
-  }
-
-  const money = (value: number) => `₹${value.toLocaleString("en-IN")}`;
-
-  return (
-    <main className="site">
-      <header className="header">
-        <a href="#" className="brand"><img src="/not-logo.png" alt="NoT — Need of Time" /></a>
-        <nav>
-          <a href="#shop">Shop</a>
-          <a href="#about">About</a>
-          <a href="#contact">Contact</a>
-          <button className="cartButton" onClick={() => setCartOpen(true)} aria-label="Open cart">
-            Bag <span>{cart.length}</span>
-          </button>
-        </nav>
-      </header>
-
-      <section className="hero">
-        <div className="heroCopy">
-          <p className="eyebrow">NO T · NEED OF TIME</p>
-          <h1>Make time yours.</h1>
-          <p className="lead">Thoughtful everyday products for people who move with purpose.</p>
-          <a className="primary" href="#shop">Shop the collection</a>
-        </div>
-        <div className="heroMark"><img src="/not-logo.png" alt="" /></div>
-      </section>
-
-      <section id="shop" className="shop">
-        <div className="sectionHead">
-          <div>
-            <p className="eyebrow">THE COLLECTION</p>
-            <h2>Shop NoT</h2>
-          </div>
-          <input
-            aria-label="Search products"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search products..."
-          />
-        </div>
-
-        <div className="filters">
-          {categories.map((item) => (
-            <button key={item} className={category === item ? "filter active" : "filter"} onClick={() => setCategory(item)}>
-              {item}
-            </button>
-          ))}
-        </div>
-
-        <div className="grid">
-          {visibleProducts.map((product) => (
-            <article className="card" key={product.id}>
-              <div className="productVisual">
-                {product.tag && <span className="tag">{product.tag}</span>}
-                {product.imageUrl?<img className="productImage" src={product.imageUrl} alt={product.name}/>:<div className="visualLogo">NoT</div>}
-              </div>
-              <div className="cardBody">
-                <p className="category">{product.category}</p>
-                <h3>{product.name}</h3>
-                <p>{product.description}</p>
-                <div className="cardFoot">
-                  <strong>{money(product.price)}</strong>
-                  <button disabled={product.stock===0} onClick={() => addToCart(product.id)}>{product.stock===0?"Out of stock":"Add to bag"}</button>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-
-        {visibleProducts.length === 0 && <div className="empty">No products match your search.</div>}
-      </section>
-
-      <section id="about" className="about">
-        <p className="eyebrow">ABOUT NoT</p>
-        <h2>Designed around your time.</h2>
-        <p>Stage 3 adds persistent cart state, a delivery checkout flow, order confirmation and a production-ready foundation for connecting live payments.</p>
-      </section>
-
-      <footer id="contact">
-        <img src="/not-logo.png" alt="NoT" />
-        <p>Need of Time · NoT Brands</p>
-      </footer>
-
-      {cartOpen && (
-        <div className="overlay" onClick={() => setCartOpen(false)}>
-          <aside className="drawer" onClick={(e) => e.stopPropagation()}>
-            <div className="drawerHead">
-              <h2>Your bag</h2>
-              <button onClick={() => setCartOpen(false)}>Close</button>
-            </div>
-            {cartProducts.length === 0 ? (
-              <div className="empty">Your bag is empty.</div>
-            ) : (
-              <>
-                <div className="cartList">
-                  {cartProducts.map((product, index) => (
-                    <div className="cartItem" key={`${product.id}-${index}`}>
-                      <div><strong>{product.name}</strong><small>{product.category}</small></div>
-                      <div><strong>{money(product.price)}</strong><button onClick={() => removeFromCart(index)}>Remove</button></div>
-                    </div>
-                  ))}
-                </div>
-                <div className="checkout">
-                  <div><span>Total</span><strong>{money(total)}</strong></div>
-                  <Link className="primary full" href="/checkout" onClick={() => setCartOpen(false)}>Continue to checkout</Link>
-                </div>
-              </>
-            )}
-          </aside>
-        </div>
-      )}
-    </main>
-  );
+export default function Home(){
+ const[category,setCategory]=useState("All");const[query,setQuery]=useState("");const[cart,setCart]=useState<number[]>([]);const[cartOpen,setCartOpen]=useState(false);const[products,setProducts]=useState<Product[]>([]);const[loading,setLoading]=useState(true);
+ useEffect(()=>{try{setCart(JSON.parse(localStorage.getItem("not-cart")||"[]"))}catch{} fetch("/api/products",{cache:"no-store"}).then(r=>r.json()).then(d=>setProducts(d.products||[])).finally(()=>setLoading(false))},[]);
+ useEffect(()=>{localStorage.setItem("not-cart",JSON.stringify(cart))},[cart]);
+ const categories=useMemo(()=>["All",...Array.from(new Set(products.map(p=>p.category)))],[products]);
+ const visible=useMemo(()=>products.filter(p=>(category==="All"||p.category===category)&&`${p.name} ${p.description} ${p.category}`.toLowerCase().includes(query.toLowerCase())),[products,category,query]);
+ const cartProducts=cart.map(id=>products.find(p=>p.id===id)!).filter(Boolean);const total=cartProducts.reduce((s,p)=>s+p.price,0);const money=(v:number)=>`₹${v.toLocaleString("en-IN")}`;
+ function chooseCategory(name:string){setCategory(categories.includes(name)?name:"All");document.getElementById("shop")?.scrollIntoView({behavior:"smooth"})}
+ return <main className="editorialSite">
+  <div className="announcement">FREE SHIPPING ON ORDERS ABOVE ₹1,499</div>
+  <header className="editorialHeader"><a href="#" className="editorialBrand"><img src="/not-logo.png" alt="NoT — Need of Time"/></a><nav><a href="#new">New in</a><a href="#shop">Shop</a><a href="#collections">Collections</a><a href="#story">Our story</a><a href="#contact">Contact</a></nav><button className="miniBag" onClick={()=>setCartOpen(true)}>Bag <span>{cart.length}</span></button></header>
+  <section className="editorialHero" id="new"><div className="heroEditorialCopy"><p className="redEyebrow">THE EVERYDAY EDIT</p><h1>Effortless style,<br/>made for now.</h1><p>Comfort-led women’s essentials designed to move with your day—minimal silhouettes, soft fabrics and timeless tones.</p><a className="squareButton" href="#shop">SHOP NEW ARRIVALS</a></div><div className="heroArt"><div className="heroArch"><span>Soft tailoring.<br/>Everyday confidence.</span></div></div></section>
+  <section className="collectionSection" id="collections"><p className="redEyebrow centered">SHOP YOUR STYLE</p><h2>Made for every moment</h2><p className="sectionNote">Clean silhouettes. Easy layers. Uncomplicated dressing.</p><div className="collectionTiles"><button className="collectionTile tileOne" onClick={()=>chooseCategory("Apparel")}><span>Everyday Essentials →</span></button><button className="collectionTile tileTwo" onClick={()=>chooseCategory("Women")}><span>Workwear Edit →</span></button><button className="collectionTile tileThree" onClick={()=>chooseCategory("Lifestyle")}><span>Weekend Comfort →</span></button></div></section>
+  <section className="trendingSection" id="shop"><div className="shopTitle"><div><p className="redEyebrow">CUSTOMER FAVOURITES</p><h2>Trending now</h2></div><input aria-label="Search products" value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search the collection"/></div><div className="editorialFilters">{categories.map(c=><button key={c} className={category===c?"active":""} onClick={()=>setCategory(c)}>{c}</button>)}</div>
+   {loading?<div className="storeMessage">Loading the collection…</div>:visible.length===0?<div className="storeMessage">No products match your search.</div>:<div className="editorialGrid">{visible.map((p,i)=><article className="editorialCard" key={p.id}><div className={`editorialVisual shade${i%4}`}>{p.tag&&<span className="editorialTag">{p.tag}</span>}{p.imageUrl?<img src={p.imageUrl} alt={p.name}/>:<span className="visualWords">{p.description.split(" ").slice(0,3).join(" ")}</span>}</div><div className="editorialProductInfo"><p>{p.category}</p><h3>{p.name}</h3><div><strong>{money(p.price)}</strong><button disabled={!p.stock} onClick={()=>setCart(v=>[...v,p.id])}>{p.stock?"Add to bag":"Sold out"}</button></div></div></article>)}</div>}
+  </section>
+  <section className="brandStory" id="story"><div className="storyPanel"><span>Designed for real life.</span></div><div><p className="redEyebrow">OUR PHILOSOPHY</p><h2>Need of Time</h2><p>NoT creates versatile clothing that feels good, looks refined and stays relevant beyond a season. We believe the best wardrobe is the one you reach for every day.</p><a href="#shop">Discover the collection →</a></div></section>
+  <footer className="editorialFooter" id="contact"><img src="/not-logo.png" alt="NoT"/><div><strong>Need of Time</strong><p>Comfort, considered.</p></div><a href="mailto:hello@notbrands.com">Contact us</a></footer>
+  {cartOpen&&<div className="overlay" onClick={()=>setCartOpen(false)}><aside className="drawer" onClick={e=>e.stopPropagation()}><div className="drawerHead"><h2>Your bag</h2><button onClick={()=>setCartOpen(false)}>Close</button></div>{!cartProducts.length?<div className="empty">Your bag is empty.</div>:<><div className="cartList">{cartProducts.map((p,i)=><div className="cartItem" key={`${p.id}-${i}`}><div><strong>{p.name}</strong><small>{p.category}</small></div><div><strong>{money(p.price)}</strong><button onClick={()=>setCart(v=>v.filter((_,n)=>n!==i))}>Remove</button></div></div>)}</div><div className="checkout"><div><span>Total</span><strong>{money(total)}</strong></div><Link className="primary full" href="/checkout" onClick={()=>setCartOpen(false)}>Continue to checkout</Link></div></>}</aside></div>}
+ </main>
 }
