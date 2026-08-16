@@ -100,3 +100,5 @@ footer p { color:#6a645b; font-size:13px; }
 .orderCard span { color:#777; font-size:12px; text-transform:uppercase; letter-spacing:.08em; }
 @media (max-width:800px) { .checkoutWrap { grid-template-columns:1fr; gap:25px; } .summary { position:static; } }
 @media (max-width:520px) { .checkoutWrap { padding-left:20px; padding-right:20px; } .formGrid { grid-template-columns:1fr; } .formGrid .wide { grid-column:auto; } .successPage h1 { font-size:58px; } }
+
+.paymentChoices{display:grid;gap:12px;margin:14px 0}.paymentChoices label{border:1px solid #ddd;padding:14px;border-radius:12px;display:flex;gap:10px;align-items:center}.adminOrders{display:grid;gap:12px;margin-top:28px}.adminOrder{border:1px solid #ddd;border-radius:14px;padding:16px;display:grid;gap:8px}.adminOrder>div{display:flex;justify-content:space-between;gap:20px}.adminOrder small{display:block;color:#666}.adminOrder p{margin:0;color:#555}
