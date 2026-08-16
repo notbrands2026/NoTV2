@@ -1,24 +1,23 @@
-# NoT v2.0 — Vercel-ready
+# NoT Brands — Stage 2
 
-A minimal Next.js ecommerce storefront scaffold configured for Vercel.
+Stage 2 turns the Stage 1 Vercel scaffold into a functional storefront MVP.
 
-## Run locally
+### Included
+- NoT / Need of Time logo in the header, hero and footer
+- Responsive ecommerce storefront
+- Product catalog with INR pricing
+- Category filtering
+- Product search
+- Add-to-bag and remove-from-bag interactions
+- Cart drawer with live item count and total
+- Mobile responsive layout
+- Vercel-ready Next.js App Router
+
+### Stage 3 candidates
+Payment gateway, persistent database/cart, authentication, orders, admin dashboard and real product images.
+
+Run locally:
 ```bash
 npm install
 npm run dev
 ```
-
-## Production build
-```bash
-npm run build
-npm start
-```
-
-## Deploy to Vercel
-Import this repository into Vercel, or run:
-```bash
-npx vercel
-npx vercel --prod
-```
-
-No secrets are required for this Stage 1 scaffold.
