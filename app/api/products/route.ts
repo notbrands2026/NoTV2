@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 const authorized = (req: Request) => Boolean(process.env.ADMIN_TOKEN) && req.headers.get("x-admin-token") === process.env.ADMIN_TOKEN;
 
 export async function GET(req: Request) {
@@ -10,7 +11,7 @@ export async function GET(req: Request) {
     where: admin ? undefined : { active: true },
     orderBy: { createdAt: "asc" },
   });
-  return NextResponse.json({ products });
+  return NextResponse.json({ products }, { headers: { "Cache-Control": "no-store, max-age=0" } });
 }
 
 export async function POST(req: Request) {

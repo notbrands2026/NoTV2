@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { products } from "@/lib/products";
 
 export const runtime = "nodejs";
 
@@ -13,7 +12,9 @@ export async function POST(req: Request) {
     if (!customer?.name || !customer?.email || !customer?.phone || !customer?.address || !customer?.city || !customer?.state || !customer?.pincode || !Array.isArray(items) || !items.length) {
       return NextResponse.json({ error: "Complete customer details and cart are required." }, { status: 400 });
     }
-    const cleanItems = items.map((id: number) => products.find(p => p.id === Number(id))).filter(Boolean);
+    const ids = items.map((id: number) => Number(id));
+    const availableProducts = await db.product.findMany({ where: { id: { in: ids }, active: true, stock: { gt: 0 } } });
+    const cleanItems = ids.map((id: number) => availableProducts.find(p => p.id === id)).filter(Boolean);
     if (cleanItems.length !== items.length) return NextResponse.json({ error: "One or more products are invalid." }, { status: 400 });
     const total = cleanItems.reduce((sum, p) => sum + p!.price, 0);
     const order = await db.order.create({ data: {
