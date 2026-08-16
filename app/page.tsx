@@ -13,27 +13,20 @@ type Product = {
   price: number;
   description: string;
   tag?: string;
+  imageUrl?: string | null;
+  stock: number;
 };
-
-const products: Product[] = [
-  { id: 1, name: "NoT Essential Tee", category: "Apparel", price: 799, description: "Everyday heavyweight tee with the NoT identity.", tag: "New" },
-  { id: 2, name: "Need of Time Hoodie", category: "Apparel", price: 1499, description: "Relaxed-fit hoodie built for everyday comfort.", tag: "Best Seller" },
-  { id: 3, name: "NoT Signature Cap", category: "Accessories", price: 599, description: "Minimal cap with a clean embroidered mark." },
-  { id: 4, name: "NoT Everyday Tote", category: "Accessories", price: 449, description: "Durable carry-all for work, travel and daily use." },
-  { id: 5, name: "Timekeeper Journal", category: "Lifestyle", price: 349, description: "A simple premium journal for ideas, plans and notes." },
-  { id: 6, name: "NoT Classic Bottle", category: "Lifestyle", price: 699, description: "Reusable bottle with a clean, timeless finish." },
-];
-
-const categories = ["All", "Apparel", "Accessories", "Lifestyle"];
 
 export default function Home() {
   const [category, setCategory] = useState("All");
   const [query, setQuery] = useState("");
   const [cart, setCart] = useState<number[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
+  const [products, setProducts] = useState<Product[]>([]);
 
   useEffect(() => {
     try { setCart(JSON.parse(localStorage.getItem("not-cart") || "[]")); } catch {}
+    fetch("/api/products", { cache: "no-store" }).then(r=>r.json()).then(d=>setProducts(d.products||[])).catch(()=>setProducts([]));
   }, []);
 
   useEffect(() => { localStorage.setItem("not-cart", JSON.stringify(cart)); }, [cart]);
@@ -48,6 +41,7 @@ export default function Home() {
 
   const cartProducts = cart.map((id) => products.find((p) => p.id === id)!).filter(Boolean);
   const total = cartProducts.reduce((sum, p) => sum + p.price, 0);
+  const categories = useMemo(() => ["All", ...Array.from(new Set(products.map(p=>p.category)))], [products]);
 
   function addToCart(id: number) {
     setCart((current) => [...current, id]);
@@ -110,7 +104,7 @@ export default function Home() {
             <article className="card" key={product.id}>
               <div className="productVisual">
                 {product.tag && <span className="tag">{product.tag}</span>}
-                <div className="visualLogo">NoT</div>
+                {product.imageUrl?<img className="productImage" src={product.imageUrl} alt={product.name}/>:<div className="visualLogo">NoT</div>}
               </div>
               <div className="cardBody">
                 <p className="category">{product.category}</p>
@@ -118,7 +112,7 @@ export default function Home() {
                 <p>{product.description}</p>
                 <div className="cardFoot">
                   <strong>{money(product.price)}</strong>
-                  <button onClick={() => addToCart(product.id)}>Add to bag</button>
+                  <button disabled={product.stock===0} onClick={() => addToCart(product.id)}>{product.stock===0?"Out of stock":"Add to bag"}</button>
                 </div>
               </div>
             </article>

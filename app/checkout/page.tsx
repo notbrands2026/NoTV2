@@ -4,18 +4,14 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-const products = [
-  { id: 1, name: "NoT Essential Tee", price: 799, category: "Apparel" }, { id: 2, name: "Need of Time Hoodie", price: 1499, category: "Apparel" },
-  { id: 3, name: "NoT Signature Cap", price: 599, category: "Accessories" }, { id: 4, name: "NoT Everyday Tote", price: 449, category: "Accessories" },
-  { id: 5, name: "Timekeeper Journal", price: 349, category: "Lifestyle" }, { id: 6, name: "NoT Classic Bottle", price: 699, category: "Lifestyle" },
-];
+type Product={id:number;name:string;price:number;category:string};
 type Form={name:string;email:string;phone:string;address:string;city:string;state:string;pincode:string};
 const empty:Form={name:"",email:"",phone:"",address:"",city:"",state:"",pincode:""};
 declare global { interface Window { Razorpay:any } }
 export default function Checkout(){
- const router=useRouter(); const [cart,setCart]=useState<number[]>([]); const [form,setForm]=useState< Form >(empty); const [provider,setProvider]=useState("razorpay"); const [error,setError]=useState(""); const [busy,setBusy]=useState(false);
- useEffect(()=>{try{setCart(JSON.parse(localStorage.getItem("not-cart")||"[]"))}catch{setCart([])}},[]);
- const items=useMemo(()=>cart.map(id=>products.find(p=>p.id===id)).filter(Boolean) as typeof products,[cart]); const total=items.reduce((s,p)=>s+p.price,0); const money=(v:number)=>`₹${v.toLocaleString("en-IN")}`;
+ const router=useRouter(); const [cart,setCart]=useState<number[]>([]); const [products,setProducts]=useState<Product[]>([]); const [form,setForm]=useState< Form >(empty); const [provider,setProvider]=useState("razorpay"); const [error,setError]=useState(""); const [busy,setBusy]=useState(false);
+ useEffect(()=>{try{setCart(JSON.parse(localStorage.getItem("not-cart")||"[]"))}catch{setCart([])} fetch("/api/products",{cache:"no-store"}).then(r=>r.json()).then(d=>setProducts(d.products||[])).catch(()=>setError("Unable to load products."))},[]);
+ const items=useMemo(()=>cart.map(id=>products.find(p=>p.id===id)).filter(Boolean) as Product[],[cart,products]); const total=items.reduce((s,p)=>s+p.price,0); const money=(v:number)=>`₹${v.toLocaleString("en-IN")}`;
  async function pay(e:React.FormEvent){e.preventDefault();setError("");if(!items.length){setError("Your bag is empty.");return} if(Object.values(form).some(v=>!v.trim())){setError("Please complete all delivery details.");return} setBusy(true);
    try{const r=await fetch("/api/payments/create",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({customer:form,items:cart,provider})}); const d=await r.json(); if(!r.ok)throw new Error(d.error||"Payment setup failed");
     if(provider==="stripe"){window.location.href=d.url;return}
